@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class ToDoListViewController: UIViewController {
    
@@ -21,6 +22,26 @@ class ToDoListViewController: UIViewController {
         tableView.dataSource = self
         
         loadData()
+        autherizeLocalNotifications()
+        
+    }
+    
+    func autherizeLocalNotifications() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error)
+            in
+            guard error == nil else {
+                print("ERROR: \(error!.localizedDescription)")
+                return
+            }
+            if granted {
+                print("Notifications Authorzation Granted!")
+            } else {
+                print("The user has denied notifications!")
+            }
+        }
+    }
+    
+    func setCalendarNotification(title: String, subtitle: String, body: String, badgeNumber: NSNumber?, sound: UNNotificationSound?, date: Date) -> String {
         
     }
     
@@ -47,8 +68,9 @@ class ToDoListViewController: UIViewController {
             try data?.write(to: documentURL, options: .noFileProtection)
         } catch {
             print("ERROR: Could not save data \(error.localizedDescription)")
-    
         }
+        let toDoItem = toDoItems.first!
+        let notificationID = setCalendarNotification(title: toDoItem.name, subtitle: "SUBTITLE would go here", body: toDoItem.notes, badgeNumber: nil, sound: .default, date: toDoItem.date)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
